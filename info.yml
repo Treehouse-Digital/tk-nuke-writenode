@@ -31,7 +31,8 @@ configuration:
             Optional configuration dictionary fields/keys which doesn't need to be defined:
 
             - 'ext_field': Name of the file extension (no dot) field in the templates to substitute
-              with the 'file_type'. Defaults to "ext"
+              with the 'file_type'. Defaults to "extension", a common alias used throughout
+              tk-config-default2/core/templates.yml
 
         allows_empty: True
         values:

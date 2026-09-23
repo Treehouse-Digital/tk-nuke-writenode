@@ -1907,7 +1907,7 @@ class TankWriteNodeHandler(object):
         # update with file extension if required
         if (
             (profile := self.__get_node_profile_settings(node))
-            and (ext_field := str(profile.get("ext_field") or "ext"))
+            and (ext_field := str(profile.get("ext_field") or "extension"))
             and ext_field in render_template.keys
             and ext_field not in fields
             and (file_type := profile.get("file_type"))
