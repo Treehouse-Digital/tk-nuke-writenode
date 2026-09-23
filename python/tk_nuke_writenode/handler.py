@@ -74,6 +74,11 @@ class TankWriteNodeHandler(object):
         """
         return self._profile_names
 
+    @property
+    def hook(self) -> sgtk.Hook:
+        """Return the hook instance associated with this handler's app instance."""
+        return self._app.hook
+
     ################################################################################################
     # Public methods
 
@@ -1226,6 +1231,8 @@ class TankWriteNodeHandler(object):
         # the node automatically updating without the user's knowledge.
         if profile_name != old_profile_name:
             self.reset_render_path(node)
+            self.hook.post_profile_changed(node, old_profile_name, profile_name)
+        self.hook.post_profile_set(node, profile_name)
 
     def __populate_initial_output_name(self, template, node):
         """
