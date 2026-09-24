@@ -514,6 +514,9 @@ class TankWriteNodeHandler(object):
             new_wn.setXpos(node_pos[0])
             new_wn.setYpos(node_pos[1])
 
+            # Hide properties to prevent pop-up spam
+            new_wn.hideControlPanel()
+
     def convert_nuke_to_sg_write_nodes(self):
         """
         Utility function to convert all Nuke Write nodes to Shotgun
@@ -636,6 +639,9 @@ class TankWriteNodeHandler(object):
             new_sg_wn.setName(node_name)
             new_sg_wn.setXpos(node_pos[0])
             new_sg_wn.setYpos(node_pos[1])
+
+            # Hide properties to prevent pop-up spam
+            new_sg_wn.hideControlPanel()
 
     ################################################################################################
     # Public methods called from gizmo - although these are public, they should
