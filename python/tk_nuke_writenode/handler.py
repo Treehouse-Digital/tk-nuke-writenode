@@ -74,6 +74,11 @@ class TankWriteNodeHandler(object):
         """
         return self._profile_names
 
+    @property
+    def hook(self) -> sgtk.Hook:
+        """Return the hook instance associated with this handler's app instance."""
+        return self._app.hook
+
     ################################################################################################
     # Public methods
 
@@ -127,13 +132,19 @@ class TankWriteNodeHandler(object):
         """
         return node.knob("profile_name").value()
 
+    def get_node_profile_settings(self, node: nuke.Node) -> dict:
+        """Get node's current profile's settings.
+
+        Returned dictionary will be empty if no valid settings found.
+        """
+        settings = self.__get_node_profile_settings(node)
+        return settings if settings and isinstance(settings, dict) else {}
+
     def get_node_tank_type(self, node):
         """
         Return the tank type for the specified node
         """
-        settings = self.__get_node_profile_settings(node)
-        if settings:
-            return settings["tank_type"]
+        return self.get_node_profile_settings(node).get("tank_type")
 
     def get_render_template(self, node):
         """
@@ -412,9 +423,10 @@ class TankWriteNodeHandler(object):
             node_name = sg_wn.name()
             node_pos = (sg_wn.xpos(), sg_wn.ypos())
 
-            # create new regular Write node:
-            new_wn = nuke.createNode("Write")
-            new_wn.setSelected(False)
+            # create new regular Write node in main node graph (see self.get_nodes()):
+            with nuke.root():
+                new_wn = nuke.createNode("Write")
+                new_wn.setSelected(False)
 
             # copy across file & proxy knobs (if we've defined a proxy template):
             new_wn["file"].setValue(sg_wn["cached_path"].evaluate())
@@ -1220,6 +1232,8 @@ class TankWriteNodeHandler(object):
         # the node automatically updating without the user's knowledge.
         if profile_name != old_profile_name:
             self.reset_render_path(node)
+            self.hook.post_profile_changed(node, old_profile_name, profile_name)
+        self.hook.post_profile_set(node, profile_name)
 
     def __populate_initial_output_name(self, template, node):
         """
@@ -1903,6 +1917,16 @@ class TankWriteNodeHandler(object):
 
         # update with additional fields from the context:
         fields.update(self._app.context.as_template_fields(render_template))
+
+        # update with file extension if required
+        if (
+            (profile := self.__get_node_profile_settings(node))
+            and (ext_field := str(profile.get("ext_field") or "extension"))
+            and ext_field in render_template.keys
+            and ext_field not in fields
+            and (file_type := profile.get("file_type"))
+        ):
+            fields[ext_field] = file_type
 
         # generate the render path:
         path = ""
