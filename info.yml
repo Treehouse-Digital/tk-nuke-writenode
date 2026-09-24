@@ -109,6 +109,7 @@ configuration:
 
             - `post_profile_changed` called when the write node's profile changes.
             - `post_profile_set` called when the write node's profile is set, regardless of whether it changed.
+            - `create_read_nodes` called to create read nodes associated with the tk write node.
 
     template_script_work:
         type: template
