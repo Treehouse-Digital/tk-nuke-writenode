@@ -12,6 +12,12 @@ class WriteNodeHook(sgtk.get_hook_baseclass()):
         """Return the TankWriteNodeHandler instance of tk-nuke-writenode app."""
         return self.parent.handler
 
+    def post_create_new_node(self, node: nuke.Node, profile_name: str) -> None:
+        """Callback triggered only after handler created a new write node.
+
+        This is triggered after `.post_profile_set` is called.
+        """
+
     def post_profile_changed(
         self, node: nuke.Node, old_profile_name: str, profile_name: str
     ) -> None:

@@ -97,6 +97,7 @@ configuration:
         description: |-
             Hook with methods to configure additional behaviors:
 
+            - `post_create_new_node` called when handler created a new write node.
             - `post_profile_changed` called when the write node's profile changes.
             - `post_profile_set` called when the write node's profile is set, regardless of whether it changed.
 
