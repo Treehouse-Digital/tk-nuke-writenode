@@ -266,6 +266,7 @@ class TankWriteNodeHandler(object):
         # set the profile:
         self.__set_profile(node, profile_name, reset_all_settings=True)
 
+        self.hook.post_create_new_node(node, profile_name)
         return node
 
     def process_placeholder_nodes(self):
