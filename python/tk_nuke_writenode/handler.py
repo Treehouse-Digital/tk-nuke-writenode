@@ -8,18 +8,17 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from collections.abc import Iterable, Iterator
+import base64
+import datetime
 import os
+import pickle
+import re
 import sys
 import tempfile
-import pickle
-import datetime
-import base64
-import re
+from collections.abc import Iterable, Iterator
 
 import nuke
 import nukescripts
-
 import sgtk
 from sgtk import TankError
 
@@ -29,7 +28,7 @@ class TkComputePathError(TankError):
     pass
 
 
-class TankWriteNodeHandler(object):
+class TankWriteNodeHandler:
     """
     Handles requests and processing from a tank write node.
     """
@@ -466,9 +465,9 @@ class TankWriteNodeHandler(object):
                 new_wn.setSelected(False)
 
             # copy across file & proxy knobs (if we've defined a proxy template):
-            new_wn["file"].setValue(sg_wn["cached_path"].evaluate())
+            new_wn["file"].setValue(sg_wn["cached_path"].value())
             if sg_wn["proxy_render_template"].value():
-                new_wn["proxy"].setValue(sg_wn["tk_cached_proxy_path"].evaluate())
+                new_wn["proxy"].setValue(sg_wn["tk_cached_proxy_path"].value())
             else:
                 new_wn["proxy"].setValue("")
 
@@ -875,7 +874,7 @@ class TankWriteNodeHandler(object):
                 exec(cmd)
             except Exception:
                 self._app.log_error(
-                    "The Write node's beforeRender setting failed " "to execute!"
+                    "The Write node's beforeRender setting failed to execute!"
                 )
                 raise
 
@@ -902,7 +901,7 @@ class TankWriteNodeHandler(object):
                 exec(cmd)
             except Exception:
                 self._app.log_error(
-                    "The Write node's afterRender setting failed " "to execute!"
+                    "The Write node's afterRender setting failed to execute!"
                 )
                 raise
 
@@ -1048,8 +1047,7 @@ class TankWriteNodeHandler(object):
                 # chop off this bit from the normalized path
                 local_path = render_dir[len(context_path) :]
                 # drop start slash
-                if local_path.startswith(os.sep):
-                    local_path = local_path[len(os.sep) :]
+                local_path = local_path.removeprefix(os.sep)
                 # e.g. for path   /mnt/proj/shotXYZ/renders/v003/hello.%04d.exr
                 # context_path:   /mnt/proj/shotXYZ
                 # local_path:     renders/v003
